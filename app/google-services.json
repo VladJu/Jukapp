@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "139529148220",
+    "project_id": "juk-aap",
+    "storage_bucket": "juk-aap.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139529148220:android:371433d89f6c36f5e93039",
+        "android_client_info": {
+          "package_name": "com.example.jukapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139529148220-qbp1lmubv6uptjsiu9jn2gornd59vnlt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jukapp",
+            "certificate_hash": "1e14360d48f2c0179f825dc7140a6091a6ffd122"
+          }
+        },
+        {
+          "client_id": "139529148220-cjb8ol09htiscmq21td57bnghqp3sf7p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLOpraxG-Cc1A0Gy7zeGoZkJJNzEqWZz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139529148220-cjb8ol09htiscmq21td57bnghqp3sf7p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

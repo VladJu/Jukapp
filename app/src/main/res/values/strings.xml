@@ -10,4 +10,12 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="displaying_an_image_in_a_chat">отображение изображения в чате</string>
+    <string name="edit_Text_enter_your_email">Введите ваш Email</string>
+    <string name="edit_Text_enter_your_password">Введите ваш пароль</string>
+    <string name="textView_Register">Регистрация</string>
+    <string name="button_enter">Войти</string>
+    <string name="logo_add_image">Логотип добавления картинки</string>
+    <string name="logo_send_a_message_image">Логотип отправки сообщения</string>
+    <string name="enter_a_message">введите сообщение</string>
+    <string name="textView_I_already_have_an_account">У меня уже есть аккаунт</string>
 </resources>

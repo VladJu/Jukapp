@@ -20,7 +20,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     private static final int TYPE_MY_MESSAGE = 1;
     private static final int TYPE_OTHER_MESSAGE = 2;
 
-    private Context context;
+    private final Context context;
 
     private List<Message> messages;
 
@@ -95,9 +95,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView textViewAuthor;
-        private TextView textViewOfMessage;
-        private ImageView imageViewImage;
+        private final TextView textViewAuthor;
+        private final TextView textViewOfMessage;
+        private final ImageView imageViewImage;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);

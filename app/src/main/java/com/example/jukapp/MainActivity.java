@@ -5,50 +5,32 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -57,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private FirebaseAuth mAuth;
-    //Ссылка на хранилище
-    private FirebaseStorage storage;
     //общее хранилище данных
     private StorageReference reference;
 
@@ -66,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private MessagesAdapter adapter;
 
     private EditText editTextMultiLineMessage;
-    private ImageView imageViewSendMessage;
-    private ImageView imageViewAddImage;
 
     private SharedPreferences preferences;
 
@@ -96,39 +74,32 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         // создаем ссылку на хранилище
-        storage = FirebaseStorage.getInstance();
+        //Ссылка на хранилище
+        FirebaseStorage storage = FirebaseStorage.getInstance();
         //общее хранилище данных
         reference = storage.getReference();
         // Получаем досуп к главной папке , в которой все лежит, то есть в гланой папке,в которой лежат все файлы , мы создали папку для хранения изображений
         // reference = storageRef.child("images");
         recyclerViewMessages = findViewById(R.id.recyclerViewMessages);
         editTextMultiLineMessage = findViewById(R.id.editTextMultiLineMessage);
-        imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
-        imageViewAddImage = findViewById(R.id.imageViewAddImage);
+        ImageView imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
+        ImageView imageViewAddImage = findViewById(R.id.imageViewAddImage);
         adapter = new MessagesAdapter(this);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewMessages.setAdapter(adapter);
-        imageViewAddImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //получаем изображение с телефона
-                //Получаем контент
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //Указываем какой именно контент получаем
-                intent.setType("image/jpeg");
-                //получаем изображеие с локального хранилища (из галереи пользвоателя )
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                //запускаем активномть
-                getImageActivityResultLauncher.launch(intent);
-            }
+        imageViewAddImage.setOnClickListener(view -> {
+            //получаем изображение с телефона
+            //Получаем контент
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            //Указываем какой именно контент получаем
+            intent.setType("image/jpeg");
+            //получаем изображеие с локального хранилища (из галереи пользвоателя )
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            //запускаем активномть
+            getImageActivityResultLauncher.launch(intent);
         });
-        imageViewSendMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendMessage(editTextMultiLineMessage.getText().toString().trim(), null);
-            }
-        });
+        imageViewSendMessage.setOnClickListener(view -> sendMessage(editTextMultiLineMessage.getText().toString().trim(), null));
         if (mAuth.getCurrentUser() != null) {
             preferences.edit().putString("author",mAuth.getCurrentUser().getEmail()).apply();
         } else {
@@ -148,12 +119,9 @@ public class MainActivity extends AppCompatActivity {
             message = new Message(author, null, System.currentTimeMillis(), urlToImage);
         }
         if (message != null) {
-            db.collection("messages").add(message).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                @Override
-                public void onSuccess(DocumentReference documentReference) {
-                    editTextMultiLineMessage.setText(" ");
-                    recyclerViewMessages.scrollToPosition(adapter.getItemCount() - 1);
-                }
+            db.collection("messages").add(message).addOnSuccessListener(documentReference -> {
+                editTextMultiLineMessage.setText(" ");
+                recyclerViewMessages.scrollToPosition(adapter.getItemCount() - 1);
             });
         }
 
@@ -162,14 +130,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        db.collection("messages").orderBy("date").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                if (value != null) {
-                    List<Message> messages = value.toObjects(Message.class);
-                    adapter.setMessages(messages);
-                    recyclerViewMessages.scrollToPosition(adapter.getItemCount() - 1);
-                }
+        db.collection("messages").orderBy("date").addSnapshotListener((value, error) -> {
+            if (value != null) {
+                List<Message> messages = value.toObjects(Message.class);
+                adapter.setMessages(messages);
+                recyclerViewMessages.scrollToPosition(adapter.getItemCount() - 1);
             }
         });
     }
@@ -208,19 +173,16 @@ public class MainActivity extends AppCompatActivity {
                                         // Ссылка на наше хранилище
                                         return referenceToImage.getDownloadUrl();
                                     }
-                                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        if (task.isSuccessful()) {
-                                            //Получаем Адресс изображения на сервере и ЗАГРУЖАЕММ!
-                                            Uri downloadUri = task.getResult();
-                                            if (downloadUri != null) {
-                                                sendMessage(null, downloadUri.toString());
-                                            }
-                                        }  // Handle failures
-                                        // ...
+                                }).addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        //Получаем Адресс изображения на сервере и ЗАГРУЖАЕММ!
+                                        Uri downloadUri = task.getResult();
+                                        if (downloadUri != null) {
+                                            sendMessage(null, downloadUri.toString());
+                                        }
+                                    }  // Handle failures
+                                    // ...
 
-                                    }
                                 });
                             }
                         }
@@ -245,23 +207,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signOut() {
-        AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    // Выберите предпочтительные методы входа:
-                    List<AuthUI.IdpConfig> providers = Arrays.asList(
-                            new AuthUI.IdpConfig.EmailBuilder().build(),
-                            new AuthUI.IdpConfig.PhoneBuilder().build(),
-                            new AuthUI.IdpConfig.GoogleBuilder().build());
+        AuthUI.getInstance().signOut(this).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Выберите предпочтительные методы входа:
+                List<AuthUI.IdpConfig> providers = Arrays.asList(
+                        new AuthUI.IdpConfig.EmailBuilder().build(),
+                        new AuthUI.IdpConfig.PhoneBuilder().build(),
+                        new AuthUI.IdpConfig.GoogleBuilder().build());
 
 // Создание и запуск намерения входа в систему
-                    Intent signInIntent = AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .build();
-                    signInLauncher.launch(signInIntent);
-                }
+                Intent signInIntent = AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build();
+                signInLauncher.launch(signInIntent);
             }
         });
 

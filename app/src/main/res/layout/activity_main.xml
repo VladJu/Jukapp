@@ -13,16 +13,19 @@
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
+        android:hint="@string/enter_a_message"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageViewSendMessage"
         app:layout_constraintStart_toEndOf="@+id/imageViewAddImage"
-        tools:ignore="SpeakableTextPresentCheck" />
+        tools:ignore="SpeakableTextPresentCheck"
+        android:importantForAutofill="no"
+        tools:targetApi="o" />
 
     <ImageView
         android:id="@+id/imageViewAddImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:contentDescription="Логотип добавления картинки"
+        android:contentDescription="@string/logo_add_image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_crop" />
@@ -31,7 +34,7 @@
         android:id="@+id/imageViewSendMessage"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:contentDescription="Логотип отправки сообщения"
+        android:contentDescription="@string/logo_send_a_message_image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_dialog_email" />
